@@ -396,6 +396,9 @@ public:
 
     #if EITHER(HAS_WIRED_LCD, DWIN_CREALITY_LCD_JYERSUI)
       static bool get_blink();
+      #if ENABLED(SLOW_PROGRESS_DISPLAY_ROTATION)
+        static bool get_double_blink();
+      #endif
     #endif
 
     #if HAS_WIRED_LCD

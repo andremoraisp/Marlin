@@ -551,7 +551,7 @@ void MarlinUI::draw_status_screen() {
       if (ev != lastElapsed) {
         lastElapsed = ev;
         const uint8_t len = elapsed.toDigital(elapsed_string, can_show_days && elapsed.value >= 60*60*24L);
-        elapsed_x_pos = _SD_INFO_X(len);
+        elapsed_x_pos = _SD_INFO_X(len + 2);
 
         #if ENABLED(SHOW_REMAINING_TIME)
           if (!(ev & 0x3)) {
@@ -568,7 +568,7 @@ void MarlinUI::draw_status_screen() {
             else {
               duration_t estimation = timeval;
               const uint8_t len = estimation.toDigital(estimation_string, can_show_days && estimation.value >= 60*60*24L);
-              estimation_x_pos = _SD_INFO_X(len + !BOTH(SHOW_SD_PERCENT, ROTATE_PROGRESS_DISPLAY));
+              estimation_x_pos = _SD_INFO_X(len + 2 * !BOTH(SHOW_SD_PERCENT, ROTATE_PROGRESS_DISPLAY));
             }
           }
         #endif
@@ -813,13 +813,22 @@ void MarlinUI::draw_status_screen() {
         //
 
         #if ENABLED(SHOW_REMAINING_TIME)
-          if (blink && estimation_string[0]) {
-            lcd_put_wchar(estimation_x_pos, EXTRAS_BASELINE, 'R');
-            lcd_put_u8str(estimation_string);
-          }
-          else
+          #if ENABLED(SLOW_PROGRESS_DISPLAY_ROTATION)
+            const bool double_blink = get_double_blink();
+            if (double_blink && estimation_string[0]) {
+          #else
+            if (blink && estimation_string[0]) {
+          #endif
+              lcd_put_u8str(estimation_x_pos, EXTRAS_BASELINE, "R ");
+              lcd_put_u8str(estimation_string);
+            }
+            else{
+              lcd_put_u8str(elapsed_x_pos, EXTRAS_BASELINE, "E ");
+              lcd_put_u8str(elapsed_string);
+            }
+        #else
+              lcd_put_u8str(elapsed_x_pos, EXTRAS_BASELINE, elapsed_string);
         #endif
-            lcd_put_u8str(elapsed_x_pos, EXTRAS_BASELINE, elapsed_string);
 
       #endif // !SHOW_SD_PERCENT || !SHOW_REMAINING_TIME || !ROTATE_PROGRESS_DISPLAY
     }

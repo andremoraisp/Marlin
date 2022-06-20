@@ -174,6 +174,19 @@ constexpr uint8_t epps = ENCODER_PULSES_PER_STEP;
     return blink != 0;
   }
 
+  #if ENABLED(SLOW_PROGRESS_DISPLAY_ROTATION)
+    bool MarlinUI::get_double_blink() {
+      static uint8_t double_blink = 0;
+      static millis_t next_double_blink_ms = 0;
+      millis_t ms = millis();
+      if (ELAPSED(ms, next_double_blink_ms)) {
+        double_blink ^= 0xFF;
+        next_double_blink_ms = ms + 2000 - (LCD_UPDATE_INTERVAL) / 2;
+      }
+      return double_blink != 0;
+    }
+  #endif
+
 #endif
 
 // Encoder Handling
